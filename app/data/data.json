@@ -1,0 +1,36 @@
+[
+    {
+        "id": "reading-001",
+        "title": "The History of Tea",
+        "content": "Tea is one of the most popular beverages in the world. It originated in China thousands of years ago...",
+        "questions": [
+            {
+                "id": "q1",
+                "type": "multiple",
+                "question": "Where did tea originate?",
+                "options": [
+                    "India",
+                    "China",
+                    "Japan",
+                    "England"
+                ],
+                "answer": "China",
+                "explanation": "Tea originated in China over 5000 years ago, according to historical records."
+            },
+            {
+                "id": "q2",
+                "type": "true-false",
+                "question": "Tea became popular in Europe before Asia.",
+                "answer": "False",
+                "explanation": "Tea was consumed in Asia long before it became known in Europe."
+            },
+            {
+                "id": "q3",
+                "type": "fill-blank",
+                "question": "Tea is one of the most popular ______ in the world.",
+                "answer": "beverages",
+                "explanation": "This sentence comes directly from the first line of the passage."
+            }
+        ]
+    }
+]
