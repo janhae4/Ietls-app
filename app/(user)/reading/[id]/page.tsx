@@ -1,7 +1,7 @@
 "use client";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { Clock, BookOpen, Play, Pause } from "lucide-react";
+import { Clock, BookOpen, Play, Pause, Trash2 } from "lucide-react";
 import {
   Highlight,
   HighlightColor,
@@ -13,7 +13,16 @@ import {
 } from "@/app/lib/type";
 import { readingTests } from "@/app/lib/placehole-data";
 import { getDifficultyColor } from "@/app/lib/utils";
-import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
 
 const ReadingTestPage = () => {
   const params = useParams();
@@ -317,12 +326,12 @@ const ReadingTestPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header with Timer */}
+      {/* Header*/}
       <div className="bg-white shadow-sm border-b sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <h1 className="text-xl font-semibold text-gray-900">
+              <h1 className="text-xl font-black text-rose-600">
                 {selectedTest?.title}
               </h1>
               <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
@@ -359,7 +368,7 @@ const ReadingTestPage = () => {
                   setIsTestStarted(false);
                   setSelectedTest(null);
                 }}
-                className="px-4 py-2 text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-rose-600 hover:text-white cursor-pointer  transition-colors"
               >
                 Exit Test
               </button>
@@ -368,13 +377,13 @@ const ReadingTestPage = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto p-6">
-        <div className="grid lg:grid-cols-2 gap-8">
+      <div className="max-w-screen mx-auto p-10 ">
+        <div className="grid lg:grid-cols-3 gap-8">
           {/* Reading Passage */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="bg-white rounded-xl col-span-2 shadow-sm p-6">
             <div className="mb-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-gray-900">
+                <h2 className="text-xl font-black  text-gray-900">
                   {currentPassageData?.title}
                 </h2>
                 <div className="flex items-center space-x-2">
@@ -391,7 +400,7 @@ const ReadingTestPage = () => {
                 </div>
               </div>
 
-              <div className="flex items-center space-x-4 text-sm text-gray-600 mb-4">
+              <div className="flex items-center space-x-4 text-xs text-gray-600 mb-4">
                 <span className="flex items-center">
                   <BookOpen className="w-4 h-4 mr-1" />
                   {currentPassageData?.wordCount} words
@@ -403,71 +412,101 @@ const ReadingTestPage = () => {
               </div>
             </div>
 
-            <div
-              ref={textContainerRef}
-              onContextMenu={handleContextMenu}
-              onMouseUp={handleMouseUp}
-              style={{ userSelect: "text" }}
-              className="prose prose-sm max-w-none"
-            >
-              {showMenu && (
+            <ContextMenu>
+              <ContextMenuTrigger asChild>
                 <div
-                  className="fixed z-50 bg-white border border-gray-200 rounded-lg shadow-lg py-1 min-w-32"
-                  style={{ top: menuPos.y, left: menuPos.x }}
-                  onClick={handleMenuClick}
+                  ref={textContainerRef}
+                  onMouseUp={handleMouseUp}
+                  style={{ userSelect: "text" }}
+                  className="prose prose-sm max-w-none"
                 >
-                  <div className="px-3 py-2 text-xs font-medium text-gray-500 border-b border-gray-100">
-                    Select Highlight Color
+                  <div className="columns-2 gap-8 text-justify text-gray-700 leading-relaxed">
+                    {currentPassageData?.content
+                      .split("\n\n")
+                      .map((paragraph, index) => (
+                        <p key={index} className="mb-4 break-inside-avoid">
+                          {paragraph}
+                        </p>
+                      ))}
                   </div>
-                  {(
-                    Object.entries(highlightColors) as [
-                      HighlightColor,
-                      HighlightColorConfig
-                    ][]
-                  ).map(([color, classes]) => (
-                    <button
-                      key={color}
-                      onClick={() => handleHighlight(color)}
-                      className="w-full flex items-center px-3 py-2 text-sm hover:bg-gray-50 transition-colors"
-                    >
-                      <div
-                        className={`w-4 h-4 rounded mr-2 ${classes.bg} border ${classes.border}`}
-                      />
-                      <span className="capitalize">{color} highlight</span>
-                    </button>
-                  ))}
                 </div>
-              )}
+              </ContextMenuTrigger>
 
-              {currentPassageData?.content
-                .split("\n\n")
-                .map((paragraph, index) => (
-                  <p key={index} className="mb-4 text-gray-700 leading-relaxed">
-                    {paragraph}
-                  </p>
-                ))}
-            </div>
+              <ContextMenuContent className="w-52">
+                <ContextMenuSub>
+                  <ContextMenuSubTrigger>
+                    <div className="flex  items-center">
+                      <div
+                        className={`w-4 h-4 rounded mr-3 ${highlightColors[selectedHighlightColor].bg} border ${highlightColors[selectedHighlightColor].border}`}
+                      />
+                      <span>Select Highlight Color</span>
+                    </div>
+                  </ContextMenuSubTrigger>
+
+                  <ContextMenuSubContent>
+                    {(
+                      Object.entries(highlightColors) as [
+                        HighlightColor,
+                        HighlightColorConfig
+                      ][]
+                    ).map(([color, config]) => (
+                      <ContextMenuItem
+                        key={color}
+                        onClick={() => handleHighlight(color)}
+                        className={`${
+                          selectedHighlightColor === color ? "bg-accent" : ""
+                        } p-1 rounded-lg`}
+                      >
+                        <div className="flex items-center gap-4 w-full px-2">
+                          <div className="flex items-center">
+                            <div
+                              className={`w-4 h-4 rounded mr-3 ${config.bg} border ${config.border}`}
+                            />
+                            <span className="capitalize">{color}</span>
+                          </div>
+                          {selectedHighlightColor === color && (
+                            <div className="ml-auto w-2 h-2 bg-blue-500 rounded-full" />
+                          )}
+                        </div>
+                      </ContextMenuItem>
+                    ))}
+                  </ContextMenuSubContent>
+                </ContextMenuSub>
+
+                <ContextMenuSeparator />
+
+                <ContextMenuItem
+                  onClick={clearAllHighlights}
+                  className="text-red-600 focus:text-red-600 focus:bg-red-50 flex items-center p-1 rounded-lg outline-red-700/50"
+                >
+                  <Trash2 className="mr-3 h-4 w-4 text-rose-600" />
+                  <span>Remove All Highlights</span>
+                </ContextMenuItem>
+              </ContextMenuContent>
+            </ContextMenu>
           </div>
 
           {/* Questions Panel */}
           <div className="bg-white rounded-xl shadow-sm p-6 sticky top-20 self-baseline max-h-[calc(100vh-3rem)] overflow-y-auto">
             <div className="mb-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Questions
-                </h3>
+              <div className="flex justify-between mb-4">
+                <div className="flex gap-3 justify-between">
+                  <h3 className="text-lg font-black text-gray-900">
+                    Questions
+                  </h3>
+
+                  {/* Question Type Badge */}
+                  <span className="inline-block text-xs bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full font-medium mb-4">
+                    {currentQuestionData?.type
+                      .replace("-", " ")
+                      .replace(/\b\w/g, (l) => l.toUpperCase())}
+                  </span>
+                </div>
                 <span className="text-sm text-gray-600">
                   {currentQuestion + 1} of{" "}
                   {currentPassageData?.questions.length || 1}
                 </span>
               </div>
-
-              {/* Question Type Badge */}
-              <span className="inline-block bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm font-medium mb-4">
-                {currentQuestionData?.type
-                  .replace("-", " ")
-                  .replace(/\b\w/g, (l) => l.toUpperCase())}
-              </span>
             </div>
 
             {/* Current Question */}
@@ -569,7 +608,7 @@ const ReadingTestPage = () => {
                   <button
                     key={index}
                     onClick={() => setCurrentQuestion(index)}
-                    className={`w-8 h-8 rounded-full text-sm font-medium transition-colors ${
+                    className={`w-8 h-8 rounded-full text-sm font-medium transition-colors cursor-pointer ${
                       index === currentQuestion
                         ? "bg-blue-600 text-white"
                         : answers[currentPassageData?.questions[index].id]
@@ -595,7 +634,7 @@ const ReadingTestPage = () => {
                   currentQuestion ===
                   (currentPassageData?.questions.length || 1) - 1
                 }
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors"
               >
                 Next
               </button>
@@ -611,7 +650,7 @@ const ReadingTestPage = () => {
                       setCurrentQuestion(0);
                     }}
                     disabled={currentPassage === 0}
-                    className="px-4 py-2 text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="px-4 py-2 text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
                   >
                     Previous Passage
                   </button>
@@ -635,7 +674,7 @@ const ReadingTestPage = () => {
                       currentPassage ===
                       (selectedTest?.passages.length || 1) - 1
                     }
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
                   >
                     Next Passage
                   </button>
